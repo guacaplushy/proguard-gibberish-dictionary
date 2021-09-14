@@ -1,0 +1,32 @@
+task genDict{
+outputs.file('path')
+doLast{
+    def r =new Random()
+    def begin = 97
+    def end = 122
+    def chars = (begin..end)
+            .findAll { Character.isValidCodePoint(it) && Character.isJavaIdentifierPart(it) && Character.isLetter(it) }
+            .collect { String.valueOf(Character.toChars(it)) }
+    int max = chars.size()
+    def start = []
+    def dict = []
+    def c1 = ""
+    for (int x = 0; x < 100000; x++) {
+      for (int i = 0; i < 25; i++) {
+        char c2 = chars.get( Math.abs( new Random().nextInt() % (max) ) ).charAt(0)
+        if (Character.isJavaIdentifierStart(c2)) {
+          c1 += String.valueOf(c2)
+        }
+      }
+      start << c1
+      c1 = ""
+    }
+    println("Generated " + start.size() + " random strings")
+    def f = outputs.files.getSingleFile()
+    f.getParentFile().mkdirs()
+    f.withWriter("UTF-8") {
+        it.write(start.join(System.lineSeparator()))
+        it.write()
+    }
+}
+}
